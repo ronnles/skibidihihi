@@ -467,3 +467,294 @@
         }
     </style>
 </head>
+<body>
+
+    <div class="ambient-glow glow-1"></div>
+    <div class="ambient-glow glow-2"></div>
+
+    <div class="denied-container" id="accessDeniedScreen" style="display: none;">
+        <h1 class="denied-title">⚠️ TRUY CẬP BỊ TỪ CHỐI</h1>
+        <p class="denied-desc">Liên kết đã hết hạn hoặc bạn đang vào từ Lịch sử / Bookmark.</p>
+        <p class="denied-action">Vui lòng mở lại Roblox Script và bấm "LẤY KEY NGAY" để vượt link!</p>
+    </div>
+
+    <div class="hub-card" id="mainHubScreen" style="display: none;">
+        <div class="logo-wrapper">
+            <div class="logo-box">👑</div>
+        </div>
+
+        <div class="hub-header">
+            <div class="hub-title">Lennon Hub</div>
+            <div class="hub-subtitle">script : lennonhub</div>
+        </div>
+
+        <div class="status-row">
+            <div class="status-label">🔑 Trạng Thái Key:</div>
+            <div class="status-badge">
+                <div class="status-dot"></div>
+                Đang Hoạt Động
+            </div>
+        </div>
+
+        <div class="grid-info">
+            <div class="info-card">
+                <span class="label">Đổi Key:</span>
+                <span class="val highlight">00:00 Hàng Ngày</span>
+            </div>
+            <div class="info-card">
+                <span class="label">Múi giờ:</span>
+                <span class="val">GMT+7 (VN)</span>
+            </div>
+        </div>
+
+        <div class="key-section">
+            <div class="key-header">
+                <span class="key-title">MÃ KEY HÔM NAY:</span>
+                <span class="key-badge-status" id="keyBadgeStatus">Chưa nhận</span>
+            </div>
+
+            <div class="key-display-box" id="keyDisplayBox">
+                <div class="key-text" id="keyText">•••••••••••••••••••••</div>
+            </div>
+
+            <button class="btn-action" id="btnAction" onclick="handleKeyAction()">
+                <span id="btnIcon">✨</span>
+                <span id="btnText">NHẬN KEY NGAY</span>
+            </button>
+        </div>
+
+        <div class="script-section">
+            <div class="script-header">
+                <span class="script-title">⚡ SCRIPT LENNON HUB</span>
+                <button class="btn-copy-script" onclick="copyScriptCode()">Sao chép Script</button>
+            </div>
+            <div class="script-code-box" id="scriptCode">
+                <span class="keyword">loadstring</span>(game:HttpGet(<span class="string">"https://raw.githubusercontent.com/ronnles/skibidihihi/refs/heads/main/lennon-keyless.lua"</span>))()
+            </div>
+        </div>
+
+        <div class="sfx-row">
+            <div class="sfx-label">🔔 Hiệu ứng âm thanh SFX:</div>
+            <button class="sfx-toggle-btn active" id="sfxToggle" onclick="toggleSFX()">
+                <span id="sfxState">Bật 🟢</span>
+            </button>
+        </div>
+
+        <div class="footer-note">
+            Nhập Key vào Script trong game để kích hoạt tự động!
+        </div>
+    </div>
+
+    <div class="toast-notification" id="toast">
+        <span id="toastIcon">👑</span>
+        <span id="toastMsg">Đã nhận thành công Key Lennon Hub hôm nay!</span>
+    </div>
+        <script>
+        // =========================================================================
+        //  1. CƠ CHẾ KHÓA 1 LẦN (ANTI-HISTORY / ANTI-RELOAD)
+        // =========================================================================
+        const VALID_PASSWORDS = ["lennon2026", "clover2026", "omg2026"];
+        const urlParams = new URLSearchParams(window.location.search);
+        const pass = urlParams.get('pass');
+
+        const navEntry = performance.getEntriesByType && performance.getEntriesByType('navigation')[0];
+        const isReload = navEntry ? (navEntry.type === 'reload') : (performance.navigation && performance.navigation.type === 1);
+
+        const isPassAlreadyUsed = localStorage.getItem("LennonHub_Pass_Used") === pass;
+
+        if (!pass || !VALID_PASSWORDS.includes(pass) || isReload || isPassAlreadyUsed) {
+            document.getElementById('accessDeniedScreen').style.display = 'flex';
+            document.getElementById('mainHubScreen').style.display = 'none';
+            window.history.replaceState({}, document.title, window.location.pathname);
+        } else {
+            localStorage.setItem("LennonHub_Pass_Used", pass);
+            document.getElementById('mainHubScreen').style.display = 'block';
+            document.getElementById('accessDeniedScreen').style.display = 'none';
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
+
+        // =========================================================================
+        //  2. HIỆU ỨNG ÂM THANH SFX
+        // =========================================================================
+        let isKeyUnlocked = false;
+        let generatedKey = "";
+        let isSfxEnabled = true;
+
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        let audioCtx = null;
+
+        function initAudio() {
+            if (!audioCtx) audioCtx = new AudioContext();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+        }
+
+        function playSound(type) {
+            if (!isSfxEnabled) return;
+            try {
+                initAudio();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                const now = audioCtx.currentTime;
+
+                if (type === 'click') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(600, now);
+                    osc.frequency.exponentialRampToValueAtTime(250, now + 0.08);
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.linearRampToValueAtTime(0, now + 0.08);
+                    osc.start(now);
+                    osc.stop(now + 0.08);
+                } else if (type === 'generate') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(280, now);
+                    osc.frequency.linearRampToValueAtTime(850, now + 0.25);
+                    gain.gain.setValueAtTime(0.22, now);
+                    gain.gain.linearRampToValueAtTime(0, now + 0.25);
+                    osc.start(now);
+                    osc.stop(now + 0.25);
+                } else if (type === 'success') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(523.25, now);
+                    osc.frequency.setValueAtTime(659.25, now + 0.08);
+                    osc.frequency.setValueAtTime(783.99, now + 0.16);
+                    osc.frequency.setValueAtTime(1046.50, now + 0.24);
+                    gain.gain.setValueAtTime(0.25, now);
+                    gain.gain.linearRampToValueAtTime(0, now + 0.38);
+                    osc.start(now);
+                    osc.stop(now + 0.38);
+                }
+            } catch (e) {}
+        }
+
+        function toggleSFX() {
+            isSfxEnabled = !isSfxEnabled;
+            const btn = document.getElementById('sfxToggle');
+            const txt = document.getElementById('sfxState');
+            if (isSfxEnabled) {
+                btn.classList.add('active');
+                txt.innerText = "Bật 🟢";
+                playSound('click');
+            } else {
+                btn.classList.remove('active');
+                txt.innerText = "Tắt 🔴";
+            }
+        }
+
+        // =========================================================================
+        //  3. THUẬT TOÁN ĐỔI KEY LENNON-XXXX-YYYY-ZZZZ (GMT+7)
+        // =========================================================================
+        function getVietnamDate() {
+            const now = new Date();
+            const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+            return new Date(utc + (3600000 * 7));
+        }
+
+        function calculateTodayKey() {
+            const vnDate = getVietnamDate();
+            const day = vnDate.getDate();
+            const month = vnDate.getMonth() + 1;
+            const year = vnDate.getFullYear();
+
+            const val1 = (day * 2027 + month * 1109 + year * 53) % 65535;
+            const val2 = (day * 6173 + month * 8819 + year * 137) % 65535;
+            const val3 = (day * 4421 + month * 5227 + year * 311) % 65535;
+
+            const hex1 = val1.toString(16).toUpperCase().padStart(4, '0');
+            const hex2 = val2.toString(16).toUpperCase().padStart(4, '0');
+            const hex3 = val3.toString(16).toUpperCase().padStart(4, '0');
+
+            return `LENNON-${hex1}-${hex2}-${hex3}`;
+        }
+
+        function copyToClipboard(text) {
+            if (navigator.clipboard && window.isSecureContext) {
+                return navigator.clipboard.writeText(text).catch(() => fallbackCopyText(text));
+            } else {
+                fallbackCopyText(text);
+                return Promise.resolve();
+            }
+        }
+
+        function fallbackCopyText(text) {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            textArea.style.position = "fixed";
+            textArea.style.left = "-999999px";
+            textArea.style.top = "-999999px";
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            try { document.execCommand('copy'); } catch (err) {}
+            document.body.removeChild(textArea);
+        }
+
+        function showToast(msg, icon = '👑') {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastMsg').innerText = msg;
+            document.getElementById('toastIcon').innerText = icon;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        function handleKeyAction() {
+            const btn = document.getElementById('btnAction');
+            const btnIcon = document.getElementById('btnIcon');
+            const btnText = document.getElementById('btnText');
+            const keyText = document.getElementById('keyText');
+            const keyDisplayBox = document.getElementById('keyDisplayBox');
+            const badge = document.getElementById('keyBadgeStatus');
+
+            if (!isKeyUnlocked) {
+                playSound('generate');
+                btn.style.pointerEvents = 'none';
+                btnText.innerText = "ĐANG TẠO KEY...";
+                btnIcon.innerText = "⏳";
+
+                setTimeout(() => {
+                    generatedKey = calculateTodayKey();
+                    isKeyUnlocked = true;
+
+                    keyText.innerText = generatedKey;
+                    keyText.classList.add('unlocked');
+                    keyDisplayBox.classList.add('unlocked');
+
+                    badge.innerText = "Đã lấy ✓";
+                    badge.classList.add('active');
+
+                    btnIcon.innerText = "📋";
+                    btnText.innerText = "SAO CHÉP KEY VÀO BỘ NHỚ TẠM";
+                    btn.style.pointerEvents = 'auto';
+
+                    playSound('success');
+                    showToast("Đã nhận thành công Key Lennon Hub hôm nay!", "👑");
+                }, 450);
+            } else {
+                playSound('click');
+                copyToClipboard(generatedKey);
+                playSound('success');
+                btn.classList.add('copied');
+                btnIcon.innerText = "✔";
+                btnText.innerText = "ĐÃ SAO CHÉP MÃ KEY!";
+                showToast("Đã sao chép mã Key vào bộ nhớ tạm!", "📋");
+
+                setTimeout(() => {
+                    btn.classList.remove('copied');
+                    btnIcon.innerText = "📋";
+                    btnText.innerText = "SAO CHÉP KEY VÀO BỘ NHỚ TẠM";
+                }, 2500);
+            }
+        }
+
+        function copyScriptCode() {
+            playSound('click');
+            const rawScript = 'loadstring(game:HttpGet("https://raw.githubusercontent.com/ronnles/skibidihihi/refs/heads/main/lennon-keyless.lua"))()';
+            copyToClipboard(rawScript);
+            playSound('success');
+            showToast("Đã sao chép Script Loader thành công!", "⚡");
+        }
+    </script>
+</body>
+</html>
