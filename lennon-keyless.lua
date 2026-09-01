@@ -1,5 +1,5 @@
 -- =========================================================================
---   👑 KEY SYSTEM LENNON HUB - PREMIUM OBSIDIAN EDITION (CYAN & GOLD UI) 👑
+--   👑 KEY SYSTEM LENNON HUB - OBSIDIAN GOLD (FIX LỖI LẶP & 10 GIÂY TOAST) 👑
 -- =========================================================================
 
 local TweenService = game:GetService("TweenService")
@@ -59,7 +59,7 @@ local Languages = {
 
 local CurrentLang = "VI"
 
--- Thuật toán sinh Key LENNON-XXXX-YYYY-ZZZZ (Đồng bộ GMT+7 với Web)
+-- Thuật toán sinh Key LENNON-XXXX-YYYY-ZZZZ (GMT+7)
 local function GenerateKey(offsetDays)
     offsetDays = offsetDays or 0
     local vnTime = os.time() + (7 * 3600) + (offsetDays * 86400)
@@ -82,7 +82,6 @@ end
 
 local TodayKey = GenerateKey(0)
 
--- Khởi chạy script chính Lennon Hub
 local function LaunchMainScript()
     task.spawn(function()
         local success, result = pcall(function()
@@ -107,8 +106,16 @@ local function FormatRemainingTime(seconds)
     end
 end
 
--- Thông báo nổi khi còn hạn 24 giờ
+-- Thông báo nổi: Đã sửa triệt để lỗi lặp và hiển thị chuẩn 10 giây
 local function ShowRemainingToast(secondsLeft)
+    -- Dọn sạch mọi Toast cũ đang chạy
+    if CoreGui:FindFirstChild("LennonHub_ToastUI") then
+        CoreGui.LennonHub_ToastUI:Destroy()
+    end
+    if LocalPlayer:FindFirstChild("PlayerGui") and LocalPlayer.PlayerGui:FindFirstChild("LennonHub_ToastUI") then
+        LocalPlayer.PlayerGui.LennonHub_ToastUI:Destroy()
+    end
+
     local ToastGui = Instance.new("ScreenGui")
     ToastGui.Name = "LennonHub_ToastUI"
     ToastGui.ResetOnSpawn = false
@@ -162,6 +169,7 @@ local function ShowRemainingToast(secondsLeft)
     Msg.TextXAlignment = Enum.TextXAlignment.Left
     Msg.Parent = ToastFrame
 
+    -- Thanh Progress Bar 10 giây
     local BarBg = Instance.new("Frame")
     BarBg.Size = UDim2.new(1, -16, 0, 3)
     BarBg.Position = UDim2.new(0, 8, 1, -6)
@@ -179,19 +187,23 @@ local function ShowRemainingToast(secondsLeft)
         Position = UDim2.new(0.5, -180, 0, 25)
     }):Play()
 
-    TweenService:Create(Bar, TweenInfo.new(5, Enum.EasingStyle.Linear), {
+    TweenService:Create(Bar, TweenInfo.new(10, Enum.EasingStyle.Linear), {
         Size = UDim2.new(0, 0, 1, 0)
     }):Play()
 
-    task.delay(5, function()
-        local t = TweenService:Create(ToastFrame, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
-            Position = UDim2.new(0.5, -180, 0, -100),
-            BackgroundTransparency = 1
-        })
-        t:Play()
-        t.Completed:Connect(function()
-            ToastGui:Destroy()
-        end)
+    task.delay(10, function()
+        if ToastFrame and ToastFrame.Parent then
+            local t = TweenService:Create(ToastFrame, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
+                Position = UDim2.new(0.5, -180, 0, -100),
+                BackgroundTransparency = 1
+            })
+            t:Play()
+            t.Completed:Connect(function()
+                if ToastGui and ToastGui.Parent then
+                    ToastGui:Destroy()
+                end
+            end)
+        end
     end)
 end
 
@@ -224,7 +236,7 @@ local function Save24hKey()
     end
 end
 
--- Tự động bỏ qua nếu máy còn hạn 24 tiếng
+-- Tự động mở Script nếu máy còn hạn 24 tiếng
 local remainingTime = GetKeyRemainingTime()
 if remainingTime and remainingTime > 0 then
     ShowRemainingToast(remainingTime)
@@ -240,7 +252,7 @@ local function SetClipboardSafe(text)
     end
 end
 
--- Hiệu ứng bấm nảy sâu (Deep Spring Click Animation) cực kỳ rõ nét
+-- Hiệu ứng co nảy phản hồi sâu (Deep Spring Click Animation)
 local function PlayDeepBounce(btn)
     local origSize = btn.Size
     local origPos = btn.Position
@@ -294,7 +306,6 @@ local MainCorner = Instance.new("UICorner")
 MainCorner.CornerRadius = UDim.new(0, 18)
 MainCorner.Parent = MainFrame
 
--- Viền kim loại Gold nhịp thở ánh kim
 local MainStroke = Instance.new("UIStroke")
 MainStroke.Thickness = 1.8
 MainStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
@@ -336,7 +347,6 @@ SubTitleLabel.Font = Enum.Font.GothamMedium
 SubTitleLabel.TextXAlignment = Enum.TextXAlignment.Left
 SubTitleLabel.Parent = HeaderBar
 
--- Nút đổi ngôn ngữ
 local OpenLangBtn = Instance.new("TextButton")
 OpenLangBtn.Size = UDim2.new(0, 95, 0, 28)
 OpenLangBtn.Position = UDim2.new(1, -95, 0, 5)
@@ -357,7 +367,6 @@ LangStroke.Color = Color3.fromRGB(180, 83, 9)
 LangStroke.Thickness = 1
 LangStroke.Parent = OpenLangBtn
 
--- Ô nhập Key
 local InputBox = Instance.new("TextBox")
 InputBox.Size = UDim2.new(1, -30, 0, 36)
 InputBox.Position = UDim2.new(0, 15, 0, 60)
@@ -380,14 +389,13 @@ InputStroke.Color = Color3.fromRGB(50, 38, 24)
 InputStroke.Thickness = 1
 InputStroke.Parent = InputBox
 
--- HÀNG NÚT CHÍNH (ĐÃ PHỐI MÀU XANH CYAN VÀ VÀNG GOLD CỰC ĐỈNH)
 local ButtonsRow = Instance.new("Frame")
 ButtonsRow.Size = UDim2.new(1, -30, 0, 38)
 ButtonsRow.Position = UDim2.new(0, 15, 0, 104)
 ButtonsRow.BackgroundTransparency = 1
 ButtonsRow.Parent = MainFrame
 
--- NÚT 1: LẤY KEY NGAY (Màu Xanh Ngọc Neon Cyan Sáng Rực Rỡ)
+-- NÚT 1: LẤY KEY (Xanh Ngọc Neon Cyan)
 local GetKeyBtn = Instance.new("TextButton")
 GetKeyBtn.Size = UDim2.new(0.5, -5, 1, 0)
 GetKeyBtn.Position = UDim2.new(0, 0, 0, 0)
@@ -408,7 +416,7 @@ GetKeyStroke.Color = Color3.fromRGB(0, 255, 220)
 GetKeyStroke.Thickness = 1.4
 GetKeyStroke.Parent = GetKeyBtn
 
--- NÚT 2: KÍCH HOẠT KEY (Màu Vàng Gold Hoàng Kim Sang Trọng)
+-- NÚT 2: KÍCH HOẠT (Vàng Gold Hoàng Kim)
 local CheckKeyBtn = Instance.new("TextButton")
 CheckKeyBtn.Size = UDim2.new(0.5, -5, 1, 0)
 CheckKeyBtn.Position = UDim2.new(0.5, 5, 0, 0)
@@ -429,7 +437,6 @@ CheckStroke.Color = Color3.fromRGB(253, 230, 138)
 CheckStroke.Thickness = 1.4
 CheckStroke.Parent = CheckKeyBtn
 
--- Nút Hướng dẫn
 local TutorialBtn = Instance.new("TextButton")
 TutorialBtn.Size = UDim2.new(1, -30, 0, 30)
 TutorialBtn.Position = UDim2.new(0, 15, 0, 150)
@@ -450,7 +457,7 @@ TutorialStroke.Color = Color3.fromRGB(60, 44, 25)
 TutorialStroke.Thickness = 1
 TutorialStroke.Parent = TutorialBtn
 
--- BANNER THÔNG BÁO (ĐÃ NÂNG CẤP CHỮ TO & RÕ NÉT HƠN)
+-- Banner thông báo chữ to
 local StatusBanner = Instance.new("Frame")
 StatusBanner.Size = UDim2.new(1, -30, 0, 34)
 StatusBanner.Position = UDim2.new(0, 15, 0, 188)
@@ -488,7 +495,6 @@ StatusProgressBar.BorderSizePixel = 0
 StatusProgressBar.ZIndex = 1
 StatusProgressBar.Parent = StatusBanner
 
--- Card Lưu ý
 local NoteCard = Instance.new("Frame")
 NoteCard.Size = UDim2.new(1, -30, 0, 178)
 NoteCard.Position = UDim2.new(0, 15, 0, 230)
@@ -563,7 +569,6 @@ LangList.BackgroundTransparency = 1
 LangList.ZIndex = 21
 LangList.Parent = LangModal
 
--- Nút Tiếng Việt
 local OptViBtn = Instance.new("TextButton")
 OptViBtn.Size = UDim2.new(1, 0, 0, 56)
 OptViBtn.Position = UDim2.new(0, 0, 0, 0)
@@ -585,7 +590,6 @@ OptViStroke.Color = Color3.fromRGB(245, 158, 11)
 OptViStroke.Thickness = 1.5
 OptViStroke.Parent = OptViBtn
 
--- Nút English
 local OptEnBtn = Instance.new("TextButton")
 OptEnBtn.Size = UDim2.new(1, 0, 0, 56)
 OptEnBtn.Position = UDim2.new(0, 0, 0, 68)
@@ -700,12 +704,11 @@ end
 
 PlayStartupIntro()
 
--- Bấm Lấy Key: Hiệu ứng Co nảy rõ rệt + Chớp sáng Banner + Hiện chữ to
+-- Bấm Lấy Key
 GetKeyBtn.MouseButton1Click:Connect(function()
     PlayDeepBounce(GetKeyBtn)
     SetClipboardSafe(KeyUrl)
     
-    -- Hiệu ứng chớp sáng viền Banner khi sao chép thành công
     StatusBanner.BackgroundColor3 = Color3.fromRGB(4, 38, 32)
     StatusBannerStroke.Color = Color3.fromRGB(0, 255, 220)
     StatusMsg.TextColor3 = Color3.fromRGB(0, 255, 220)
