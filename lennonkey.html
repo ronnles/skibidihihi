@@ -529,7 +529,7 @@
                 <button class="btn-copy-script" onclick="copyScriptCode()">Sao chép Script</button>
             </div>
             <div class="script-code-box" id="scriptCode">
-                <span class="keyword">loadstring</span>(game:HttpGet(<span class="string">"https://raw.githubusercontent.com/ronnles/skibidihihi/refs/heads/main/lennon-keyless.lua"</span>))()
+                <span class="keyword">loadstring</span>(game:HttpGet(<span class="string">"https://raw.githubusercontent.com/lennonxscripts/lennonhub/main/stealaegg.lua"</span>))()
             </div>
         </div>
 
@@ -551,26 +551,27 @@
     </div>
         <script>
         // =========================================================================
-        //  1. CƠ CHẾ KHÓA 1 LẦN (ANTI-HISTORY / ANTI-RELOAD)
+        //  1. CƠ CHẾ KIỂM TRA MẬT KHẨU & CHỐNG LƯU LỊCH SỬ CHUẨN XÁC
         // =========================================================================
         const VALID_PASSWORDS = ["lennon2026", "clover2026", "omg2026"];
         const urlParams = new URLSearchParams(window.location.search);
         const pass = urlParams.get('pass');
 
-        const navEntry = performance.getEntriesByType && performance.getEntriesByType('navigation')[0];
-        const isReload = navEntry ? (navEntry.type === 'reload') : (performance.navigation && performance.navigation.type === 1);
+        // Tự động dọn dẹp các cache lỗi cũ nếu có
+        localStorage.removeItem("LennonHub_Pass_Used");
+        localStorage.removeItem("CloverHub_Pass_Used");
 
-        const isPassAlreadyUsed = localStorage.getItem("LennonHub_Pass_Used") === pass;
-
-        if (!pass || !VALID_PASSWORDS.includes(pass) || isReload || isPassAlreadyUsed) {
-            document.getElementById('accessDeniedScreen').style.display = 'flex';
-            document.getElementById('mainHubScreen').style.display = 'none';
-            window.history.replaceState({}, document.title, window.location.pathname);
-        } else {
-            localStorage.setItem("LennonHub_Pass_Used", pass);
+        if (pass && VALID_PASSWORDS.includes(pass)) {
+            // HỢP LỆ (Vừa vượt link rút gọn xong): Cho vào nhận Key ngay lập tức!
             document.getElementById('mainHubScreen').style.display = 'block';
             document.getElementById('accessDeniedScreen').style.display = 'none';
+            
+            // Xóa ngay tham số ?pass=... khỏi thanh địa chỉ để trình duyệt không lưu vào Lịch sử
             window.history.replaceState({}, document.title, window.location.pathname);
+        } else {
+            // KHÔNG HỢP LỆ (Mở lại từ Lịch sử / Bookmark / Tải lại F5 khi đã mất đuôi ?pass):
+            document.getElementById('accessDeniedScreen').style.display = 'flex';
+            document.getElementById('mainHubScreen').style.display = 'none';
         }
 
         // =========================================================================
@@ -750,7 +751,7 @@
 
         function copyScriptCode() {
             playSound('click');
-            const rawScript = 'loadstring(game:HttpGet("https://raw.githubusercontent.com/ronnles/skibidihihi/refs/heads/main/lennon-keyless.lua"))()';
+            const rawScript = 'loadstring(game:HttpGet("https://raw.githubusercontent.com/lennonxscripts/lennonhub/main/stealaegg.lua"))()';
             copyToClipboard(rawScript);
             playSound('success');
             showToast("Đã sao chép Script Loader thành công!", "⚡");
