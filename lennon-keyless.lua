@@ -1,5 +1,5 @@
 -- =========================================================================
---   👑 KEY SYSTEM LENNON HUB - OBSIDIAN GOLD (FIX LỖI LẶP & 10 GIÂY TOAST) 👑
+--   👑 KEY SYSTEM LENNON HUB - NẠP SCRIPT CHÍNH (STEALAEGG.LUA) 👑
 -- =========================================================================
 
 local TweenService = game:GetService("TweenService")
@@ -11,7 +11,7 @@ local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local KeyUrl = "https://link4m.org/WAk5bo0"
 local TutorialUrl = "https://cbrowse.github.io/browse/getkey.html"
-local TargetScriptUrl = "https://raw.githubusercontent.com/ronnles/skibidihihi/refs/heads/main/lennon-keyless.lua"
+local TargetScriptUrl = "https://raw.githubusercontent.com/lennonxscripts/lennonhub/main/stealaegg.lua"
 local KeyFileName = "LennonHub_KeyData.json"
 
 local Languages = {
@@ -82,6 +82,7 @@ end
 
 local TodayKey = GenerateKey(0)
 
+-- Khởi chạy script chính stealaegg.lua
 local function LaunchMainScript()
     task.spawn(function()
         local success, result = pcall(function()
@@ -106,9 +107,8 @@ local function FormatRemainingTime(seconds)
     end
 end
 
--- Thông báo nổi: Đã sửa triệt để lỗi lặp và hiển thị chuẩn 10 giây
+-- Thông báo nổi: Chống lặp instance + hiển thị chuẩn 10 giây
 local function ShowRemainingToast(secondsLeft)
-    -- Dọn sạch mọi Toast cũ đang chạy
     if CoreGui:FindFirstChild("LennonHub_ToastUI") then
         CoreGui.LennonHub_ToastUI:Destroy()
     end
@@ -169,7 +169,6 @@ local function ShowRemainingToast(secondsLeft)
     Msg.TextXAlignment = Enum.TextXAlignment.Left
     Msg.Parent = ToastFrame
 
-    -- Thanh Progress Bar 10 giây
     local BarBg = Instance.new("Frame")
     BarBg.Size = UDim2.new(1, -16, 0, 3)
     BarBg.Position = UDim2.new(0, 8, 1, -6)
@@ -236,7 +235,7 @@ local function Save24hKey()
     end
 end
 
--- Tự động mở Script nếu máy còn hạn 24 tiếng
+-- Tự động mở Script nếu còn hạn 24 tiếng
 local remainingTime = GetKeyRemainingTime()
 if remainingTime and remainingTime > 0 then
     ShowRemainingToast(remainingTime)
@@ -252,7 +251,6 @@ local function SetClipboardSafe(text)
     end
 end
 
--- Hiệu ứng co nảy phản hồi sâu (Deep Spring Click Animation)
 local function PlayDeepBounce(btn)
     local origSize = btn.Size
     local origPos = btn.Position
@@ -284,7 +282,6 @@ ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 pcall(function() ScreenGui.Parent = CoreGui end)
 if not ScreenGui.Parent then ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui") end
 
--- Khung chính Obsidian Dark Glass
 local MainFrame = Instance.new("Frame")
 MainFrame.Name = "MainFrame"
 MainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
@@ -395,7 +392,7 @@ ButtonsRow.Position = UDim2.new(0, 15, 0, 104)
 ButtonsRow.BackgroundTransparency = 1
 ButtonsRow.Parent = MainFrame
 
--- NÚT 1: LẤY KEY (Xanh Ngọc Neon Cyan)
+-- NÚT 1: LẤY KEY NGAY (Màu Xanh Ngọc Neon Cyan)
 local GetKeyBtn = Instance.new("TextButton")
 GetKeyBtn.Size = UDim2.new(0.5, -5, 1, 0)
 GetKeyBtn.Position = UDim2.new(0, 0, 0, 0)
@@ -416,7 +413,7 @@ GetKeyStroke.Color = Color3.fromRGB(0, 255, 220)
 GetKeyStroke.Thickness = 1.4
 GetKeyStroke.Parent = GetKeyBtn
 
--- NÚT 2: KÍCH HOẠT (Vàng Gold Hoàng Kim)
+-- NÚT 2: KÍCH HOẠT KEY (Màu Vàng Gold Hoàng Kim)
 local CheckKeyBtn = Instance.new("TextButton")
 CheckKeyBtn.Size = UDim2.new(0.5, -5, 1, 0)
 CheckKeyBtn.Position = UDim2.new(0.5, 5, 0, 0)
